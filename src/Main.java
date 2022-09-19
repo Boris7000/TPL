@@ -76,9 +76,9 @@ public class Main {
         System.out.println("}");
 
         boolean is0 = check0Type(v_t,v_n,s,p);
-        boolean is1 = check1Type(v_t,v_n,s,p);
-        boolean is2= check2Type(v_t,v_n,s,p);
-        boolean is3 = check3Type(v_t,v_n,s,p);
+        boolean is1 = is0&&check1Type(v_t,v_n,s,p);
+        boolean is2 = is1&&check2Type(v_t,v_n,s,p);
+        boolean is3 = is2&&check3Type(v_t,v_n,s,p);
 
 
         System.out.printf(Locale.getDefault(),
