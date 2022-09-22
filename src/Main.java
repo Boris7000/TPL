@@ -252,6 +252,7 @@ public class Main {
         return contextIndependent;
     }
 
+
     //Регулярная
     public static boolean check3Type(String[] terminals, String[] notTerminals, String initString, ArrayList<Rule> p){
         /*должны быть такие правила вывода в правой части которых в конце или в начале располагаются не терминал */
