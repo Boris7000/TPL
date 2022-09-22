@@ -194,7 +194,7 @@ public class Main {
             } // иначе в строке только один символ и это терминал (в строке нет не терминалов)
         } else {
             String chr1 = String.valueOf(s.charAt(0));
-            String chr2 = String.valueOf(s.length() - 1);
+            String chr2 = String.valueOf(s.charAt(s.length() - 1));
             boolean containsLeft = notTerminalAL.contains(chr1);
             boolean containsRight = notTerminalAL.contains(chr2);
             if (containsLeft && containsRight) {
@@ -217,7 +217,7 @@ public class Main {
         String[] rightPart = rule.getRightPartArray();
         if(rightPart.length>0){
             for (String s:rightPart) {
-                if(currentDetectedSide==0||currentDetectedSide==4) {
+                if(currentDetectedSide==0 || currentDetectedSide==4) {
                     currentDetectedSide = hasTerminalOnTheSideInString(s, notTerminalAL);
                 } else {
                     int newDetectedSide = hasTerminalOnTheSideInString(s, notTerminalAL);
@@ -276,18 +276,15 @@ public class Main {
         for (Rule r:p) {
             if(currentDetectedSide==0||currentDetectedSide==4){
                 currentDetectedSide = hasTerminalOnTheSideInRuleRightPart(r, notTerminalAL);
-                if(currentDetectedSide==5||currentDetectedSide==0){ // в первом же правиле не терминалов вообще нет либо они с разных сторон
+                if(currentDetectedSide == 0 || currentDetectedSide == 3 || currentDetectedSide == 5){
+                    // в первом же правиле не терминалов вообще нет либо, либо они с двух сторон, либо они с разных сторон
                     return false;
                 }
             } else {
                 int newDetectedSide = hasTerminalOnTheSideInRuleRightPart(r, notTerminalAL);
-                if (newDetectedSide == 0 || newDetectedSide == 5) {
-                    return false; // в последующем правиле не терминалов вообще нет либо они с разных сторон
-                }
-                if (newDetectedSide != 4) {
-                    if (newDetectedSide != currentDetectedSide) {
-                        return false; // в правилах не терминалы с разных сторон
-                    }
+                if (newDetectedSide == 0 || newDetectedSide == 3 || newDetectedSide == 5) {
+                    // в последующем правиле не терминалов вообще нет либо, либо они с двух сторон, либо они с разных сторон
+                    return false;
                 }
             }
         }
