@@ -75,14 +75,37 @@ public class Main {
         }
         System.out.println("}");
 
-        boolean is0 = check0Type(v_t,v_n,s,p);
-        boolean is1 = is0&&check1Type(v_t,v_n,s,p);
-        boolean is2 = is1&&check2Type(v_t,v_n,s,p);
-        boolean is3 = is2&&check3Type(v_t,v_n,s,p);
+        ArrayList<String> terminalAL = new ArrayList<>(Arrays.asList(v_t));
+        ArrayList<String> notTerminalAL = new ArrayList<>(Arrays.asList(v_n));
 
+        boolean is0 = check0Type(terminalAL, notTerminalAL, p);
+        boolean is1 = is0&&check1Type(terminalAL, notTerminalAL, p);
+        boolean is2 = is1&&check2Type(terminalAL, notTerminalAL, p);
+        boolean is3 = is2&&check3Type(terminalAL, notTerminalAL, p);
 
-        System.out.printf(Locale.getDefault(),
-                "is 0 - %b\nis 1 - %b\nis 2 - %b\nis 3 - %b\n", is0, is1, is2, is3);
+        int type_counter = -1;
+
+        if(is0){
+            type_counter++;
+        }
+
+        if(is1){
+            type_counter++;
+        }
+        if(is2){
+            type_counter++;
+        }
+        if(is3){
+            type_counter++;
+        }
+
+        switch (type_counter){
+            default -> System.out.println("Допущена ошибка при вводе");
+            case 0 -> System.out.println("0 тип");
+            case 1 -> System.out.println("1 тип (Контекстно-зависимая)");
+            case 2 -> System.out.println("2 тип (Контекстно-свободная)");
+            case 3 -> System.out.println("3 тип (Регулярная)");
+        }
     }
 
     public static String readNextNonEmptyString(Scanner scanner){
@@ -104,16 +127,7 @@ public class Main {
         return read;
     }
 
-    public static String readNextNonEmptyTrimmedString(Scanner scanner, String[] bannedSubstrings){
-        String read = "";
-        while (read.isEmpty()){
-            read = scanner.nextLine();
-            for (String substr:bannedSubstrings) {
-                read = removeAllSubstringsInString(substr, read);
-            }
-        }
-        return read;
-    }
+
 
     public static String removeAllCharsInString(char chr, String string){
         String s = string;
@@ -135,208 +149,150 @@ public class Main {
         return s;
     }
 
-    public static String removeAllSubstringsInString(String substr, String string){
-        String s = string;
-        if(!s.isEmpty()) {
-            int pos = s.indexOf(substr);
-            while (pos >= 0) {
-                if (pos > 0) {
-                    String subs1 = s.substring(0,pos);
-                    String subs2 = s.substring(pos+substr.length());
-                    s = subs1+subs2;
-                } else {
-                    if(s.length()>=2) {
-                        s = s.substring(1);
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static boolean notEmptyRuleRightPart(Rule rule, ArrayList<String> terminalAL, ArrayList<String> notTerminalAL){
+        String[] rightPart = rule.getRightPartArray();
+        if(rightPart.length>0){
+            for (String s:rightPart) {
+                for (char chr:s.toCharArray()) {
+                    String chrS = String.valueOf(chr);
+                    if(terminalAL.contains(chrS)||notTerminalAL.contains(chrS)){
+                        return true;
                     }
                 }
-                pos = s.indexOf(substr);
             }
         }
-        return s;
+        return false;
     }
 
-    public static String trimString(String string){
-        String trimmed = string;
-        if(!trimmed.isEmpty()) {
-            trimmed = removeAllCharsInString(' ', string);
+    public static boolean hasTerminalInRuleLeftPart(Rule rule, ArrayList<String> notTerminalAL){
+        String leftPart = rule.getLeftPart();
+        for (char chr:leftPart.toCharArray()) {
+            String chrS = String.valueOf(chr);
+            if(notTerminalAL.contains(chrS)){
+                return true;
+            }
         }
-        return trimmed;
+        return false;
     }
 
+    public static boolean hasOnlyTerminalsInRuleLeftPart(Rule rule, ArrayList<String> notTerminalAL){
+        String leftPart = rule.getLeftPart();
+        for (char chr:leftPart.toCharArray()) {
+            String chrS = String.valueOf(chr);
+            if(!notTerminalAL.contains(chrS)){
+                return false;
+            }
+        }
+        return true;
+    }
 
-    //+ - это без ε
-    //* - это c ε
+    public static  int hasTerminalOnTheSideInString(String s, ArrayList<String> notTerminalAL){
+        int currentDetectedSide = 0; // в строке нет не терминалов
+        if (s.length() == 1) {
+            if (notTerminalAL.contains(s)) {
+                currentDetectedSide = 4; //в строке только один символ и это не терминал
+            } // иначе в строке только один символ и это терминал (в строке нет не терминалов)
+        } else {
+            String chr1 = String.valueOf(s.charAt(0));
+            String chr2 = String.valueOf(s.length() - 1);
+            boolean containsLeft = notTerminalAL.contains(chr1);
+            boolean containsRight = notTerminalAL.contains(chr2);
+            if (containsLeft && containsRight) {
+                currentDetectedSide = 3; //не терминал с двух сторон
+            } else {
+                if (containsLeft) {
+                    currentDetectedSide = 1; //не терминал слева
+                } else {
+                    if (containsRight) {
+                        currentDetectedSide = 2; //не терминал справа
+                    }
+                }
+            }
+        }
+        return currentDetectedSide;
+    }
+
+    public static int hasTerminalOnTheSideInRuleRightPart(Rule rule, ArrayList<String> notTerminalAL){
+        int currentDetectedSide = 0;
+        String[] rightPart = rule.getRightPartArray();
+        if(rightPart.length>0){
+            for (String s:rightPart) {
+                if(currentDetectedSide==0||currentDetectedSide==4) {
+                    currentDetectedSide = hasTerminalOnTheSideInString(s, notTerminalAL);
+                } else {
+                    int newDetectedSide = hasTerminalOnTheSideInString(s, notTerminalAL);
+                    if(newDetectedSide!=0 && newDetectedSide !=4) {
+                        if (newDetectedSide != currentDetectedSide) {
+                            return 5; // в строках не терминалы с разных сторон
+                        }
+                    }
+                }
+            }
+        }
+        return currentDetectedSide;
+    }
 
     //Контекстно-зависимая
-    public static boolean check0Type(String[] terminals, String[] notTerminals, String initString, ArrayList<Rule> p){
-        /* должны быть такие правила вывода в левой части которых есть хоть один не терминал и в правой части любая строка*/
-
-        ArrayList<String> notTerminalAL = new ArrayList<>(Arrays.asList(notTerminals));
-
-        boolean contextDependent = true;
-
+    public static boolean check0Type(ArrayList<String> terminalAL, ArrayList<String> notTerminalAL, ArrayList<Rule> p){
+        /* должны быть такие правила вывода в левой части которых есть хотя бы один не терминал и в правой части любая строка*/
         for (Rule r:p) {
-            String leftPart = r.getLeftPart();
-            boolean thereIsAtLeastOneLeft = false;
-            for (char chr:leftPart.toCharArray()) {
-                if(notTerminalAL.contains(String.valueOf(chr))){
-                    thereIsAtLeastOneLeft = true;
-                    break;
-                }
-            }
-            if(!thereIsAtLeastOneLeft){
-                contextDependent = false;
-                break;
+            if (!hasTerminalInRuleLeftPart(r, notTerminalAL)) {
+                return false;
             }
         }
-
-        return contextDependent;
+        return true;
     }
 
     //Контекстно-зависимая
-    public static boolean check1Type(String[] terminals, String[] notTerminals, String initString, ArrayList<Rule> p){
-        /* должны быть такие правила вывода в левой части которых есть хоть один не терминал и в правой части любая непустая строка*/
-
-        ArrayList<String> terminalAL = new ArrayList<>(Arrays.asList(terminals));
-        ArrayList<String> notTerminalAL = new ArrayList<>(Arrays.asList(notTerminals));
-
-        boolean contextDependent = true;
-
+    public static boolean check1Type(ArrayList<String> terminalAL, ArrayList<String> notTerminalAL, ArrayList<Rule> p){
+        /* должны быть такие правила вывода в левой части которых есть хотя бы один не терминал и в правой части любая непустая строка*/
         for (Rule r:p) {
-            String leftPart = r.getLeftPart();
-            String rightPart = r.getRightPart();
-            boolean thereIsAtLeastOneLeft = false;
-            for (char chr:leftPart.toCharArray()) {
-                if(notTerminalAL.contains(String.valueOf(chr))){
-                    thereIsAtLeastOneLeft = true;
-                    break;
-                }
-            }
-            boolean thereIsAtLeastOneRight = false;
-            for (char chr:rightPart.toCharArray()) {
-                if(terminalAL.contains(String.valueOf(chr))){
-                    thereIsAtLeastOneRight = true;
-                    break;
-                }
-                if(notTerminalAL.contains(String.valueOf(chr))){
-                    thereIsAtLeastOneRight = true;
-                    break;
-                }
-            }
-            if(!thereIsAtLeastOneLeft&&!thereIsAtLeastOneRight){
-                contextDependent = false;
-                break;
+            if(!notEmptyRuleRightPart(r, terminalAL, notTerminalAL)){
+                return false;
             }
         }
-
-        return contextDependent;
+        return true;
     }
 
     //Контекстно-независимая
-    public static boolean check2Type(String[] terminals, String[] notTerminals, String initString, ArrayList<Rule> p){
+    public static boolean check2Type(ArrayList<String> terminalAL, ArrayList<String> notTerminalAL, ArrayList<Rule> p){
         /*должны быть такие правила вывода в левой части которых располагаются только не терминалы*/
-
-        ArrayList<String> notTerminalAL = new ArrayList<>(Arrays.asList(notTerminals));
-
-        boolean contextIndependent = true;
-
         for (Rule r:p) {
-            String leftPart = r.getLeftPart();
-            int pos = notTerminalAL.indexOf(leftPart);
-            if(pos<0){
-                contextIndependent = false;
-                break;
+            if(!hasOnlyTerminalsInRuleLeftPart(r, notTerminalAL)){
+                return false;
             }
         }
-
-        return contextIndependent;
+        return true;
     }
 
     //Регулярная
-    public static boolean check3Type(String[] terminals, String[] notTerminals, String initString, ArrayList<Rule> p){
+    public static boolean check3Type(ArrayList<String> terminalAL, ArrayList<String> notTerminalAL, ArrayList<Rule> p){
         /*должны быть такие правила вывода в правой части которых в конце или в начале располагаются не терминал */
 
-        ArrayList<String> terminalAL = new ArrayList<>(Arrays.asList(terminals));
-        ArrayList<String> notTerminalAL = new ArrayList<>(Arrays.asList(notTerminals));
-
-        boolean regular = true;
-        boolean sideDetermined = false;
-        boolean rightSide = false;
-
+        int currentDetectedSide = 0;
 
         for (Rule r:p) {
-            String[] rightPartArray = r.getRightPartArray();
-            for (String rpItem:rightPartArray) {
-                char[] chars = rpItem.toCharArray();
-                char lastChar = chars[chars.length-1];
-                char firstChar = chars[0];
-
-                int type = -1;
-
-                if(!notTerminalAL.contains(String.valueOf(firstChar)) && !notTerminalAL.contains(String.valueOf(lastChar))){
-                    //Строка без не терминалов.
-                    type = 0;
-                } else {
-                    if(notTerminalAL.contains(String.valueOf(firstChar)) && !notTerminalAL.contains(String.valueOf(lastChar))){
-                        //Строка с не терминалом слева.
-                        type = 1;
-                    } else {
-                        if(!notTerminalAL.contains(String.valueOf(firstChar)) && notTerminalAL.contains(String.valueOf(lastChar))){
-                            //Строка с не терминалом справа.
-                            type = 2;
-                        } else {
-                            //Строка с не терминалом с обеих сторон.
-                            if(notTerminalAL.contains(String.valueOf(firstChar)) && notTerminalAL.contains(String.valueOf(lastChar))){
-                                type = 3;
-                            }
-                        }
+            if(currentDetectedSide==0||currentDetectedSide==4){
+                currentDetectedSide = hasTerminalOnTheSideInRuleRightPart(r, notTerminalAL);
+                if(currentDetectedSide==5||currentDetectedSide==0){ // в первом же правиле не терминалов вообще нет либо они с разных сторон
+                    return false;
+                }
+            } else {
+                int newDetectedSide = hasTerminalOnTheSideInRuleRightPart(r, notTerminalAL);
+                if (newDetectedSide == 0 || newDetectedSide == 5) {
+                    return false; // в последующем правиле не терминалов вообще нет либо они с разных сторон
+                }
+                if (newDetectedSide != 4) {
+                    if (newDetectedSide != currentDetectedSide) {
+                        return false; // в правилах не терминалы с разных сторон
                     }
                 }
-
-                switch (type) {
-                    case 0 -> {}
-                    case 1 -> {
-                        if (sideDetermined) {
-                            if (rightSide) {
-                                regular = false;
-                                break;
-                            }
-                        } else {
-                            sideDetermined = true;
-                        }
-
-                        for (int i = 1; i < chars.length; i++) {
-                            if (!terminalAL.contains(String.valueOf(chars[i]))) {
-                                regular = false;
-                                break;
-                            }
-                        }
-                    }
-                    case 2 -> {
-                        if (sideDetermined) {
-                            if (!rightSide) {
-                                regular = false;
-                                break;
-                            }
-                        } else {
-                            sideDetermined = true;
-                            rightSide = true;
-                        }
-
-                        for (int i = 0; i < chars.length - 1; i++) {
-                            if (!terminalAL.contains(String.valueOf(chars[i]))) {
-                                regular = false;
-                                break;
-                            }
-                        }
-                    }
-                    case 3 -> regular = false;
-                }
-
             }
         }
 
-        return regular;
+        return true;
     }
 
 }
