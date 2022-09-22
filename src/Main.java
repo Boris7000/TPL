@@ -127,8 +127,6 @@ public class Main {
         return read;
     }
 
-
-
     public static String removeAllCharsInString(char chr, String string){
         String s = string;
         if(!s.isEmpty()) {
@@ -149,7 +147,7 @@ public class Main {
         return s;
     }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public static boolean notEmptyRuleRightPart(Rule rule, ArrayList<String> terminalAL, ArrayList<String> notTerminalAL){
         String[] rightPart = rule.getRightPartArray();
@@ -233,6 +231,8 @@ public class Main {
         }
         return currentDetectedSide;
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     //Контекстно-зависимая
     public static boolean check0Type(ArrayList<String> terminalAL, ArrayList<String> notTerminalAL, ArrayList<Rule> p){
