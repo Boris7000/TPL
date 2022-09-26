@@ -1,0 +1,35 @@
+
+0 тип:{
+a,b
+S,A,B,C,D,F
+aSBC|abc
+bC→bc
+CB→BC
+cC→cc
+BB→bb
+}
+
+1 тип: {
+a,b,c
+S,B,C
+aSBC|abc
+bC→bc
+CB→BC
+cC→cc
+BB→bb
+}
+
+2 тип:{
+a,c,b
+S,Q
+aQb|accb
+Q→cSc
+}
+
+3 тип:{
+⟂,a,b
+S,A,B
+A⟂|B⟂
+A→a|Ba
+B→b|Bb|Ab
+}
