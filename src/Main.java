@@ -6,8 +6,6 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
 
-        System.out.println("okaaay less goooooo");
-
         System.out.println("Вспомогательные символы : \"→\" (символ вывода), \"ε\" (пустой символ).");
 
         Scanner scanner = new Scanner(System.in);
@@ -50,6 +48,8 @@ public class Main {
 
         ArrayList<Rule> p = new ArrayList<>();
 
+        p.add(new Rule("S",s));
+
         while (!read.isEmpty()){
             read = scanner.nextLine();
             if(!read.isEmpty()){
@@ -67,8 +67,6 @@ public class Main {
         ///////////////////////////////////////////////////////////////////
 
         System.out.println("P = {");
-        System.out.printf(Locale.getDefault(),
-                "   %s -> %s%n","S", s);
         for (Rule r: p) {
             System.out.printf(Locale.getDefault(),
                     "   %s -> %s%n",r.getLeftPart(), r.getRightPart());
