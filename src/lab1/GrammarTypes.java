@@ -1,11 +1,26 @@
+package lab1;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Scanner;
 
-public class Main {
+public class GrammarTypes {
     public static void main(String[] args) {
 
+        Grammar grammar = enterGrammar();
+        int type = resolveGrammarType(grammar);
+
+        switch (type){
+            default -> System.out.println("Допущена ошибка при вводе.");
+            case 0 -> System.out.println("0 тип.");
+            case 1 -> System.out.println("1 тип (Контекстно-зависимая).");
+            case 2 -> System.out.println("2 тип (Контекстно-свободная).");
+            case 3 -> System.out.println("3 тип (Регулярная).");
+        }
+    }
+
+    public static Grammar enterGrammar(){
         System.out.println("Вспомогательные символы : \"→\" (символ вывода), \"ε\" (пустой символ).");
 
         Scanner scanner = new Scanner(System.in);
@@ -34,21 +49,32 @@ public class Main {
 
         ///////////////////////////////////////////////////////////////////
 
-        System.out.println("Введите начальный символ.");
+        System.out.println("Введите начальное правило.");
 
-        read = readNextNonEmptyString(scanner);
+        ArrayList<Rule> p = new ArrayList<>();
 
-        String s = read;
+        while (true){
+            read = scanner.nextLine();
+            if(!read.isEmpty()){
+                int pos = read.indexOf("→");
+                if (pos > 0) {
+                    String subs1 = read.substring(0,pos);
+                    String subs2 = read.substring(pos+1);
+                    if(!subs2.isEmpty()){
+                        p.add(new Rule(subs1, subs2));
+                        break;
+                    }
+                }
+            }
+        }
+
+        String s = p.get(0).getLeftPart();
 
         System.out.printf(Locale.getDefault(), "G = ({ %s }, { %s }, { P }, { %s })%n",v_tS,v_nS,s);
 
         ///////////////////////////////////////////////////////////////////
 
         System.out.println("Вводите по одному правилу на строку.\n(правая и левая часть правил отделяются символом \"→\")");
-
-        ArrayList<Rule> p = new ArrayList<>();
-
-        p.add(new Rule("S",s));
 
         while (!read.isEmpty()){
             read = scanner.nextLine();
@@ -76,17 +102,20 @@ public class Main {
         ArrayList<String> terminalAL = new ArrayList<>(Arrays.asList(v_t));
         ArrayList<String> notTerminalAL = new ArrayList<>(Arrays.asList(v_n));
 
-        boolean is0 = check0Type(terminalAL, notTerminalAL, p);
-        boolean is1 = is0&&check1Type(terminalAL, notTerminalAL, p);
-        boolean is2 = is1&&check2Type(terminalAL, notTerminalAL, p);
-        boolean is3 = is2&&check3Type(terminalAL, notTerminalAL, p);
+        return new Grammar(terminalAL, notTerminalAL, p);
+    }
+
+    public static int resolveGrammarType(Grammar grammar){
+        boolean is0 = check0Type(grammar);
+        boolean is1 = is0&&check1Type(grammar);
+        boolean is2 = is1&&check2Type(grammar);
+        boolean is3 = is2&&check3Type(grammar);
 
         int type_counter = -1;
 
         if(is0){
             type_counter++;
         }
-
         if(is1){
             type_counter++;
         }
@@ -97,21 +126,7 @@ public class Main {
             type_counter++;
         }
 
-        switch (type_counter){
-            default -> System.out.println("Допущена ошибка при вводе");
-            case 0 -> System.out.println("0 тип");
-            case 1 -> System.out.println("1 тип (Контекстно-зависимая)");
-            case 2 -> System.out.println("2 тип (Контекстно-свободная)");
-            case 3 -> System.out.println("3 тип (Регулярная)");
-        }
-    }
-
-    public static String readNextNonEmptyString(Scanner scanner){
-        String read = "";
-        while (read.isEmpty()){
-            read = scanner.nextLine();
-        }
-        return read;
+        return type_counter;
     }
 
     public static String readNextNonEmptyTrimmedString(Scanner scanner, char[] bannedChars){
@@ -162,7 +177,7 @@ public class Main {
         return false;
     }
 
-    public static boolean hasTerminalInRuleLeftPart(Rule rule, ArrayList<String> notTerminalAL){
+    public static boolean hasNotTerminalInRuleLeftPart(Rule rule, ArrayList<String> notTerminalAL){
         String leftPart = rule.getLeftPart();
         for (char chr:leftPart.toCharArray()) {
             String chrS = String.valueOf(chr);
@@ -173,7 +188,7 @@ public class Main {
         return false;
     }
 
-    public static boolean hasOnlyTerminalsInRuleLeftPart(Rule rule, ArrayList<String> notTerminalAL){
+    public static boolean hasOnlyNotTerminalsInRuleLeftPart(Rule rule, ArrayList<String> notTerminalAL){
         String leftPart = rule.getLeftPart();
         for (char chr:leftPart.toCharArray()) {
             String chrS = String.valueOf(chr);
@@ -233,10 +248,10 @@ public class Main {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     //Контекстно-зависимая
-    public static boolean check0Type(ArrayList<String> terminalAL, ArrayList<String> notTerminalAL, ArrayList<Rule> p){
+    public static boolean check0Type(Grammar grammar){
         /* должны быть такие правила вывода в левой части которых есть хотя бы один не терминал и в правой части любая строка*/
-        for (Rule r:p) {
-            if (!hasTerminalInRuleLeftPart(r, notTerminalAL)) {
+        for (Rule r:grammar.getP()) {
+            if (!hasNotTerminalInRuleLeftPart(r, grammar.getNotTerminalAL())) {
                 return false;
             }
         }
@@ -244,10 +259,10 @@ public class Main {
     }
 
     //Контекстно-зависимая
-    public static boolean check1Type(ArrayList<String> terminalAL, ArrayList<String> notTerminalAL, ArrayList<Rule> p){
+    public static boolean check1Type(Grammar grammar){
         /* должны быть такие правила вывода в левой части которых есть хотя бы один не терминал и в правой части любая непустая строка*/
-        for (Rule r:p) {
-            if(!notEmptyRuleRightPart(r, terminalAL, notTerminalAL)){
+        for (Rule r:grammar.getP()) {
+            if(!notEmptyRuleRightPart(r, grammar.getTerminalAL(), grammar.getNotTerminalAL())){
                 return false;
             }
         }
@@ -255,10 +270,10 @@ public class Main {
     }
 
     //Контекстно-независимая
-    public static boolean check2Type(ArrayList<String> terminalAL, ArrayList<String> notTerminalAL, ArrayList<Rule> p){
+    public static boolean check2Type(Grammar grammar){
         /*должны быть такие правила вывода в левой части которых располагаются только не терминалы*/
-        for (Rule r:p) {
-            if(!hasOnlyTerminalsInRuleLeftPart(r, notTerminalAL)){
+        for (Rule r:grammar.getP()) {
+            if(!hasOnlyNotTerminalsInRuleLeftPart(r, grammar.getNotTerminalAL())){
                 return false;
             }
         }
@@ -266,20 +281,20 @@ public class Main {
     }
 
     //Регулярная
-    public static boolean check3Type(ArrayList<String> terminalAL, ArrayList<String> notTerminalAL, ArrayList<Rule> p){
+    public static boolean check3Type(Grammar grammar){
         /*должны быть такие правила вывода в правой части которых в конце или в начале располагаются не терминал */
 
         int currentDetectedSide = 0;
 
-        for (Rule r:p) {
+        for (Rule r: grammar.getP()) {
             if(currentDetectedSide==0||currentDetectedSide==4){
-                currentDetectedSide = hasTerminalOnTheSideInRuleRightPart(r, notTerminalAL);
+                currentDetectedSide = hasTerminalOnTheSideInRuleRightPart(r, grammar.getNotTerminalAL());
                 if(currentDetectedSide == 0 || currentDetectedSide == 3 || currentDetectedSide == 5){
                     // в первом же правиле не терминалов вообще нет либо, либо они с двух сторон, либо они с разных сторон
                     return false;
                 }
             } else {
-                int newDetectedSide = hasTerminalOnTheSideInRuleRightPart(r, notTerminalAL);
+                int newDetectedSide = hasTerminalOnTheSideInRuleRightPart(r, grammar.getNotTerminalAL());
                 if (newDetectedSide == 0 || newDetectedSide == 3 || newDetectedSide == 5) {
                     // в последующем правиле не терминалов вообще нет либо, либо они с двух сторон, либо они с разных сторон
                     return false;
@@ -289,5 +304,4 @@ public class Main {
 
         return true;
     }
-
 }

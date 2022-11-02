@@ -1,3 +1,7 @@
+package lab1;
+
+import java.util.Arrays;
+
 public class Rule {
 
     private final String leftPart;
@@ -20,5 +24,15 @@ public class Rule {
 
     public String[] getRightPartArray() {
         return rightPartArray;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Rule rule){
+            return leftPart.equals(rule.leftPart)&&
+                    rightPart.equals(rule.rightPart)&&
+                    Arrays.equals(rightPartArray, rule.rightPartArray);
+        }
+        return super.equals(obj);
     }
 }
