@@ -100,47 +100,43 @@ public class MPAutomatic {
                         MFunction rightFunction = null;
                         ArrayList<Integer> trye = trys.get(trys.size()-1);
                         //System.out.println("Найдено функций для "+currentState.getFirstStack()+" "+findFunctions.size());
-                        if(findFunctions.size()>1){
-                            //Выбор в соответствии с предыдущими попытками
-                            ArrayList<ArrayList<Integer>> sameTrys = new ArrayList<>();
-                            for (ArrayList<Integer> tr:trys) {
-                                if(tr.size()-trye.size()==1){
-                                    boolean same = true;
-                                    for (int i =0; i<trye.size();i++){
-                                        int index = tr.get(i);
-                                        int currentIndex = trye.get(i);
-                                        if(currentIndex!=index){
-                                            same = false;
-                                            break;
-                                        }
-                                    }
-                                    if(same){
-                                        sameTrys.add(tr);
-                                    }
-                                }
-                            }
-
-                            //System.out.println("Похожие попытки "+sameTrys);
-
-                            if(sameTrys.isEmpty()){
-                               rightFunction = findFunctions.get(0);
-                            } else {
-                                for (MFunction mfunction:findFunctions) {
-                                    boolean notUsed = true;
-                                    for (ArrayList<Integer> tr:sameTrys) {
-                                        if(tr.get(tr.size()-1)==mFunctions.indexOf(mfunction)){
-                                            notUsed = false;
-                                            break;
-                                        }
-                                    }
-                                    if(notUsed){
-                                        rightFunction = mfunction;
+                        //Выбор в соответствии с предыдущими попытками
+                        ArrayList<ArrayList<Integer>> sameTrys = new ArrayList<>();
+                        for (ArrayList<Integer> tr:trys) {
+                            if(tr.size()-trye.size()==1){
+                                boolean same = true;
+                                for (int i =0; i<trye.size();i++){
+                                    int index = tr.get(i);
+                                    int currentIndex = trye.get(i);
+                                    if(currentIndex!=index){
+                                        same = false;
                                         break;
                                     }
                                 }
+                                if(same){
+                                    sameTrys.add(tr);
+                                }
                             }
-                        } else {
+                        }
+
+                        //System.out.println("Похожие попытки "+sameTrys);
+
+                        if(sameTrys.isEmpty()){
                             rightFunction = findFunctions.get(0);
+                        } else {
+                            for (MFunction mfunction:findFunctions) {
+                                boolean notUsed = true;
+                                for (ArrayList<Integer> tr:sameTrys) {
+                                    if(tr.get(tr.size()-1)==mFunctions.indexOf(mfunction)){
+                                        notUsed = false;
+                                        break;
+                                    }
+                                }
+                                if(notUsed){
+                                    rightFunction = mfunction;
+                                    break;
+                                }
+                            }
                         }
                         if (rightFunction!=null){
                             //System.out.println("Выбрана функция "+mFunctions.indexOf(rightFunction));
@@ -187,6 +183,7 @@ public class MPAutomatic {
                         break;
                     }
                 }
+                scanner.nextLine();
             }
 
             //Программа показывает что ей удалось найти
@@ -224,6 +221,9 @@ public class MPAutomatic {
                             + ", входная строка = " + currentState.getInput());
                     //scanner.nextLine();
                 }
+                System.out.println("Строка принята");
+            } else {
+                System.out.println("Строка не принята");
             }
 
         } else {
@@ -240,6 +240,16 @@ public class MPAutomatic {
         ArrayList<Integer> trysBack = new ArrayList<>(trys);
         trysBack.remove(trysBack.size() - 1);
         return trysBack;
+
+        /*
+        if(!trys.isEmpty()) {
+            ArrayList<Integer> trysBack = new ArrayList<>(trys);
+            trysBack.remove(trysBack.size() - 1);
+            return trysBack;
+        } else {
+            return new ArrayList<>();
+        }
+        */
     }
 
 }
