@@ -43,7 +43,7 @@ public class MPAutomatic {
                     MFunction mFunction = new MFunction(rule1, state_q);
                     mFunctions.add(mFunction);
 
-                    System.out.println(mFunctions.indexOf(mFunction)+") "+rule1.getLeftPart()+"->"+rule1.getRightPart());
+                    System.out.println((mFunctions.indexOf(mFunction)+1)+") "+rule1.getLeftPart()+"->"+rule1.getRightPart());
                 }
             }
 
@@ -183,7 +183,7 @@ public class MPAutomatic {
                         break;
                     }
                 }
-                scanner.nextLine();
+                //scanner.nextLine();
             }
 
             //Программа показывает что ей удалось найти

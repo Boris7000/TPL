@@ -38,7 +38,7 @@ public class MPEAutomatic {
                     Rule rule1 = new Rule(rule.getLeftPart(), string);
                     MFunction mFunction = new MFunction(rule1, MFunction.state_q);
                     mFunctions.add(mFunction);
-                    System.out.println(mFunctions.indexOf(mFunction) + ") " + rule1.getLeftPart() + "->" + rule1.getRightPart());
+                    System.out.println((mFunctions.indexOf(mFunction)+1)+") "+rule1.getLeftPart()+"->"+rule1.getRightPart());
                 }
             }
             {
