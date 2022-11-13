@@ -29,12 +29,7 @@ public class State {
     }
 
     public boolean checkRight(ArrayList<String> terminals, ArrayList<String> notTerminals){
-        boolean allGood = true;
-
-
-        if(stack.isEmpty()&&!input.isEmpty()){
-            allGood = false;
-        }
+        boolean allGood = !(stack.isEmpty()&&!input.isEmpty());
 
         if(allGood) {
             if (!stack.isEmpty() && input.isEmpty()) {
