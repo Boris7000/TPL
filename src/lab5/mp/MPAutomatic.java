@@ -16,10 +16,10 @@ public class MPAutomatic {
     public static void main(String[] args) {
 
         //Ввод грамматики
-        //Grammar grammar = GrammarTypes.enterGrammar();
-        Grammar grammar = new Grammar(new ArrayList<>() {{add("+");add("(");add(")");add("a");}},
-                new ArrayList<>(){{add("S");add("A");}},
-                new ArrayList<>(){{add(new Rule("S","S+A|A"));add(new Rule("A","(S)|a"));}});
+        Grammar grammar = GrammarTypes.enterGrammar();
+        //Grammar grammar = new Grammar(new ArrayList<>() {{add("+");add("(");add(")");add("a");}},
+                //new ArrayList<>(){{add("S");add("A");}},
+                //new ArrayList<>(){{add(new Rule("S","S+A|A"));add(new Rule("A","(S)|a"));}});
         int type = GrammarTypes.resolveGrammarType(grammar);
 
         //Проверка на контекстно-свободную
