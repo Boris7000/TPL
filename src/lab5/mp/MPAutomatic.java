@@ -48,9 +48,7 @@ public class MPAutomatic {
                 }
             }
             {
-                Rule rule = new Rule("ε","");
-                p.add(rule);
-                MFunction mFunction = new MFunction(rule, state_q);
+                MFunction mFunction = new MFunction(new Rule("ε",""), state_q);
                 mFunctions.add(mFunction);
             }
 
