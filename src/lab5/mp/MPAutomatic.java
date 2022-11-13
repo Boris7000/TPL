@@ -16,10 +16,10 @@ public class MPAutomatic {
     public static void main(String[] args) {
 
         //Ввод грамматики
-        Grammar grammar = GrammarTypes.enterGrammar();
-        //Grammar grammar = new Grammar(new ArrayList<>() {{add("+");add("(");add(")");add("a");}},
-                //new ArrayList<>(){{add("S");add("A");}},
-                //new ArrayList<>(){{add(new Rule("S","S+A|A"));add(new Rule("A","(S)|a"));}});
+        //Grammar grammar = GrammarTypes.enterGrammar();
+        Grammar grammar = new Grammar(new ArrayList<>() {{add("+");add("(");add(")");add("a");}},
+                new ArrayList<>(){{add("S");add("A");}},
+                new ArrayList<>(){{add(new Rule("S","S+A|A"));add(new Rule("A","(S)|a"));}});
         int type = GrammarTypes.resolveGrammarType(grammar);
 
         //Проверка на контекстно-свободную
@@ -43,15 +43,18 @@ public class MPAutomatic {
                     MFunction mFunction = new MFunction(rule1, state_q);
                     mFunctions.add(mFunction);
 
-                    System.out.printf(Locale.getDefault(), "%d) F(%s,%s,%s)=(%s,%s)%n",
-                            mFunctions.indexOf(mFunction)+1,"q","ε",rule1.getLeftPart(),
-                            "q",rule1.getRightPart());
+                    System.out.printf(Locale.getDefault(), "%d) F(q,ε,%s)=(q,%s)%n",
+                            mFunctions.indexOf(mFunction)+1,rule1.getLeftPart(),rule1.getRightPart());
                 }
             }
+            {
+                Rule rule = new Rule("ε","");
+                p.add(rule);
+                MFunction mFunction = new MFunction(rule, state_q);
+                mFunctions.add(mFunction);
+            }
 
-            p.add(new Rule("ε",""));
-            MFunction mFunction = new MFunction(p.get(p.size()-1), state_q);
-            mFunctions.add(mFunction);
+
 
             //Магазин (стек)
             ArrayList<String> stack = new ArrayList<>();
