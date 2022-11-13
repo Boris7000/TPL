@@ -6,6 +6,7 @@ import lab1.Rule;
 import lab5.MFunction;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Scanner;
 
 import static lab5.MFunction.state_q;
@@ -17,10 +18,10 @@ public class MPEAutomatic {
     public static void main(String[] args) {
 
         //Ввод грамматики
-        Grammar grammar = GrammarTypes.enterGrammar();//Grammar grammar = GrammarTypes.enterGrammar();
-        //Grammar grammar = new Grammar(new ArrayList<>() {{add("+");add("(");add(")");add("a");}},
-        //new ArrayList<>(){{add("S");add("A");}},
-        //new ArrayList<>(){{add(new Rule("S","S+A|A"));add(new Rule("A","(S)|a"));}});
+        //Grammar grammar = GrammarTypes.enterGrammar();//Grammar grammar = GrammarTypes.enterGrammar();
+        Grammar grammar = new Grammar(new ArrayList<>() {{add("+");add("(");add(")");add("a");}},
+        new ArrayList<>(){{add("S");add("A");}},
+        new ArrayList<>(){{add(new Rule("S","S+A|A"));add(new Rule("A","(S)|a"));}});
         int type = GrammarTypes.resolveGrammarType(grammar);
 
         //Проверка на контекстно-свободную
@@ -38,14 +39,18 @@ public class MPEAutomatic {
                     Rule rule1 = new Rule(rule.getLeftPart(), string);
                     MFunction mFunction = new MFunction(rule1, MFunction.state_q);
                     mFunctions.add(mFunction);
-                    System.out.println((mFunctions.indexOf(mFunction)+1)+") "+rule1.getLeftPart()+"->"+rule1.getRightPart());
+                    System.out.printf(Locale.getDefault(), "%d) F(%s,%s,%s)=(%s,%s)%n",
+                            mFunctions.indexOf(mFunction)+1,"q","ε",rule1.getRightPart(),
+                            "q",rule1.getLeftPart());
                 }
             }
             {
                 Rule rule = new Rule("", "#" + p.get(0).getLeftPart());
                 MFunction mFunction = new MFunction(rule, MFunction.state_r);
                 mFunctions.add(mFunction);
-                System.out.println(mFunctions.indexOf(mFunction) + ") " + rule.getLeftPart() + "->" + rule.getRightPart());
+                System.out.printf(Locale.getDefault(), "%d) F(%s,%s,%s)=(%s,%s)%n",
+                        mFunctions.indexOf(mFunction)+1,"q","ε",rule.getRightPart(),
+                        "r","ε");
             }
 
             //Магазин (стек)

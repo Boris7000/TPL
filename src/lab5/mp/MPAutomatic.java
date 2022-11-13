@@ -6,6 +6,7 @@ import lab1.Rule;
 import lab5.MFunction;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Scanner;
 
 import static lab5.MFunction.state_q;
@@ -15,10 +16,10 @@ public class MPAutomatic {
     public static void main(String[] args) {
 
         //Ввод грамматики
-        Grammar grammar = GrammarTypes.enterGrammar();
-        //Grammar grammar = new Grammar(new ArrayList<>() {{add("+");add("(");add(")");add("a");}},
-                //new ArrayList<>(){{add("S");add("A");}},
-                //new ArrayList<>(){{add(new Rule("S","S+A|A"));add(new Rule("A","(S)|a"));}});
+        //Grammar grammar = GrammarTypes.enterGrammar();
+        Grammar grammar = new Grammar(new ArrayList<>() {{add("+");add("(");add(")");add("a");}},
+                new ArrayList<>(){{add("S");add("A");}},
+                new ArrayList<>(){{add(new Rule("S","S+A|A"));add(new Rule("A","(S)|a"));}});
         int type = GrammarTypes.resolveGrammarType(grammar);
 
         //Проверка на контекстно-свободную
@@ -33,7 +34,6 @@ public class MPAutomatic {
 
             //Правила
             ArrayList<Rule> p = grammar.getP();
-            p.add(new Rule("ε",""));
 
             //Магазинные функции
             ArrayList<MFunction> mFunctions =  new ArrayList<>();
@@ -43,9 +43,15 @@ public class MPAutomatic {
                     MFunction mFunction = new MFunction(rule1, state_q);
                     mFunctions.add(mFunction);
 
-                    System.out.println((mFunctions.indexOf(mFunction)+1)+") "+rule1.getLeftPart()+"->"+rule1.getRightPart());
+                    System.out.printf(Locale.getDefault(), "%d) F(%s,%s,%s)=(%s,%s)%n",
+                            mFunctions.indexOf(mFunction)+1,"q","ε",rule1.getLeftPart(),
+                            "q",rule1.getRightPart());
                 }
             }
+
+            p.add(new Rule("ε",""));
+            MFunction mFunction = new MFunction(p.get(p.size()-1), state_q);
+            mFunctions.add(mFunction);
 
             //Магазин (стек)
             ArrayList<String> stack = new ArrayList<>();
