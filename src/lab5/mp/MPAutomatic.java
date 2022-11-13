@@ -233,7 +233,7 @@ public class MPAutomatic {
                     System.out.println("Стек = " + currentState.getStack()
                             + ", входная строка = " + currentState.getInput());
                 }
-
+                System.out.println("Стек = [], входная строка = []");
                 System.out.println("Строка принята");
             } else {
                 System.out.println("Строка не принята");
