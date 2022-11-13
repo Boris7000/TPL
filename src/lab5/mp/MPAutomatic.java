@@ -78,12 +78,14 @@ public class MPAutomatic {
             //Программа строит граф
             while (!currentState.getStack().isEmpty()){
 
-                //System.out.println("Попытки "+trys);
+                /*
+                System.out.println("Попытки "+trys);
 
-                //System.out.println("Символ стека = "+currentState.getFirstStack()
-                       // +", символ входной строки = " + currentState.getFirstInput());
-                //System.out.println("Стек = "+currentState.getStack()
-                        //+", входная строка = " + currentState.getInput());
+                System.out.println("Символ стека = "+currentState.getFirstStack()
+                        +", символ входной строки = " + currentState.getFirstInput());
+                System.out.println("Стек = "+currentState.getStack()
+                        +", входная строка = " + currentState.getInput());
+                 */
 
                 if (terminals.contains(currentState.getFirstStack())){
                     if(currentState.getFirstStack().equals(currentState.getFirstInput())) {
@@ -195,30 +197,34 @@ public class MPAutomatic {
 
             //Программа показывает что ей удалось найти
             //Проверка на наличие графа
-            if (!trys.isEmpty()) {
+            if (!trys.isEmpty()&&currentState.getStack().isEmpty()&&currentState.getInput().isEmpty()) {
                 ArrayList<Integer> lastTry = trys.get(trys.size() - 1);
 
-                //System.out.println("Последняя последовательность "+lastTry);
+                System.out.println("Последняя последовательность "+lastTry);
 
-                int currentIndex = lastTry.get(0);
+                int currentIndex = 0;
 
                 currentState = new State(input, stack, state_q);
 
-                System.out.println("Стек = " + currentState.getStack()
-                        + ", входная строка = " + currentState.getInput());
+                //System.out.println("Стек = " + currentState.getStack()
+                        //+ ", входная строка = " + currentState.getInput());
 
-                while (!currentState.getStack().isEmpty()) {
-                    if (terminals.contains(currentState.getFirstStack())) {
+                while (currentIndex<lastTry.size()){
+                    if (!currentState.getStack().isEmpty()&&!currentState.getInput().isEmpty()&&
+                            terminals.contains(currentState.getFirstStack())) {
                         currentState.getStack().remove(currentState.getFirstStack());
                         currentState.getInput().remove(currentState.getFirstInput());
                     } else {
                         int selected = lastTry.get(currentIndex++);
+
                         MFunction rightFunction = mFunctions.get(selected);
 
                         Rule rule = rightFunction.getRule();
                         String rightPart = rule.getRightPart();
 
-                        currentState.getStack().remove(currentState.getFirstStack());
+                        if(!currentState.getStack().isEmpty()) {
+                            currentState.getStack().remove(currentState.getFirstStack());
+                        }
 
                         for (int i = 0; i < rightPart.length(); i++) {
                             currentState.getStack().add(i, String.valueOf(rightPart.charAt(i)));
@@ -226,8 +232,8 @@ public class MPAutomatic {
                     }
                     System.out.println("Стек = " + currentState.getStack()
                             + ", входная строка = " + currentState.getInput());
-                    //scanner.nextLine();
                 }
+
                 System.out.println("Строка принята");
             } else {
                 System.out.println("Строка не принята");

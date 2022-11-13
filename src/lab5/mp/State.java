@@ -31,8 +31,15 @@ public class State {
     public boolean checkRight(ArrayList<String> terminals, ArrayList<String> notTerminals){
         boolean allGood = true;
 
+
         if(stack.isEmpty()&&!input.isEmpty()){
             allGood = false;
+        }
+
+        if(allGood) {
+            if (!stack.isEmpty() && input.isEmpty()) {
+                allGood = false;
+            }
         }
 
         if(allGood){
