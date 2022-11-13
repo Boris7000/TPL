@@ -200,7 +200,7 @@ public class MPAutomatic {
             if (!trys.isEmpty()&&currentState.getStack().isEmpty()&&currentState.getInput().isEmpty()) {
                 ArrayList<Integer> lastTry = trys.get(trys.size() - 1);
 
-                System.out.println("Последняя последовательность "+lastTry);
+                //System.out.println("Последняя последовательность "+lastTry);
 
                 int currentIndex = 0;
 
