@@ -152,7 +152,8 @@ public class MPEAutomatic {
                             currentState.getStack().add(pos+j,String.valueOf(leftPart.charAt(j)));
                         }
 
-                        if(currentState.getState()==state_r&&!currentState.getInput().isEmpty()){
+                        if((currentState.getState()==state_r&&!currentState.getInput().isEmpty())
+                                ||(currentState.getState()==state_r&&!currentState.getStack().isEmpty())){
                             //Программа пошла не по правильному пути, откат на состояние назад
                             if (states.size() > 1) {
                                 states.remove(states.size() - 1);
