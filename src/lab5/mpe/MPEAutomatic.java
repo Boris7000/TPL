@@ -46,9 +46,8 @@ public class MPEAutomatic {
                 Rule rule = new Rule("", "#" + p.get(0).getLeftPart());
                 MFunction mFunction = new MFunction(rule, MFunction.state_r);
                 mFunctions.add(mFunction);
-                System.out.printf(Locale.getDefault(), "%d) F(%s,%s,%s)=(%s,%s)%n",
-                        mFunctions.indexOf(mFunction)+1,"q","ε",rule.getRightPart(),
-                        "r","ε");
+                System.out.printf(Locale.getDefault(), "%d) F(q,ε,%s)=(r,ε)%n",
+                        mFunctions.indexOf(mFunction)+1,rule.getRightPart());
             }
 
             //Магазин (стек)
